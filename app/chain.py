@@ -13,6 +13,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+
 def load_data(file_path: str) -> List[Document]:
     loader = CSVLoader(file_path=file_path)
     documents = loader.load()
@@ -36,12 +38,12 @@ class Rag_chain(Runnable):
 
         vectorstore = Chroma.from_documents(
             documents,
-            embedding=OpenAIEmbeddings(model="text-embedding-ada-002",api_key=os.environ["OPENAI_API_KEY"]),
+            embedding=OpenAIEmbeddings(model="text-embedding-ada-002"),
         )
 
         retriever = RunnableLambda(vectorstore.similarity_search).bind(k=5)
 
-        llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.6, api_key=os.environ["OPENAI_API_KEY"])
+        llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.6)
 
         template = """Answer the question based only on the following context:
         {context}
